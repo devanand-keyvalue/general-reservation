@@ -15,7 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, Clock, Calendar, MessageSquare, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:3001/api/v1');
 
 interface Business {
   id: string;

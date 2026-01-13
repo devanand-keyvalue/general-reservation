@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+// Use relative path in production (same domain), localhost for development
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:3001/api/v1');
 
 interface ApiOptions {
   method?: string;
