@@ -163,7 +163,7 @@ export function ReassignModal({
                     .map((r) => (
                       <SelectItem key={r.id} value={r.id}>
                         {r.name}
-                        {businessType === 'restaurant' && r.capacity && ` (${r.capacity} seats)`}
+                        {businessType === 'restaurant' && 'capacity' in r && ` (${(r as { capacity: number }).capacity} seats)`}
                       </SelectItem>
                     ))}
                 </SelectContent>

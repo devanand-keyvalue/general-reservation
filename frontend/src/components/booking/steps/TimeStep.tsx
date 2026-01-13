@@ -31,7 +31,7 @@ export function TimeStep({ businessId }: TimeStepProps) {
     queryFn: () => getAvailability(businessId, dateString, {
       party_size: business?.type === 'restaurant' ? partySize : undefined,
       service_id: business?.type === 'spa' ? selectedService?.id : undefined,
-      staff_id: business?.type === 'spa' ? selectedStaffId : undefined,
+      staff_id: business?.type === 'spa' ? (selectedStaffId || undefined) : undefined,
     }),
     enabled: !!dateString,
   });

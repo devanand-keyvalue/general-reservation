@@ -55,7 +55,7 @@ export function ConfirmStep({ businessId }: ConfirmStepProps) {
         customer_phone: customerPhone,
         party_size: business?.type === 'restaurant' ? partySize : undefined,
         service_id: business?.type === 'spa' ? selectedService?.id : undefined,
-        staff_id: business?.type === 'spa' ? staffIdToUse : undefined,
+        staff_id: business?.type === 'spa' ? (staffIdToUse || undefined) : undefined,
         notes: notes || undefined,
       });
       
