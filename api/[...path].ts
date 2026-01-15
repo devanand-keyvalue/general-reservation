@@ -16,10 +16,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  // Parse the path
+  // Parse the path - /api/v1/businessId/... -> ['v1', 'businessId', ...]
   const pathParam = req.query.path;
-  const pathParts = Array.isArray(pathParam) ? pathParam : pathParam ? [pathParam] : [];
+  const fullPath = Array.isArray(pathParam) ? pathParam : pathParam ? [pathParam] : [];
   const method = req.method || 'GET';
+
+  // Remove 'v1' prefix if present
+  const pathParts = fullPath[0] === 'v1' ? fullPath.slice(1) : fullPath;
 
   try {
     // Route: GET /api/v1/:businessId/catalog
@@ -113,7 +116,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    return res.status(404).json({ error: 'Not found', path: pathParts });
+    return res.status(404).json({ error: 'Not found', path: fullPath, pathParts });
   } catch (error) {
     console.error('API error:', error);
     return res.status(500).json({ error: 'Internal server error' });
