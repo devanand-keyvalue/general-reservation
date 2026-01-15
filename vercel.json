@@ -3,7 +3,6 @@
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
-    { "source": "/api/v1/:path*", "destination": "/api/v1" },
-    { "source": "/((?!api/).*)", "destination": "/" }
+    { "source": "/((?!api).*)", "destination": "/" }
   ]
 }
