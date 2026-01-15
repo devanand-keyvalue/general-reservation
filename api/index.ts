@@ -16,9 +16,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  // Parse the path - /api/v1/businessId/... -> ['v1', 'businessId', ...]
-  const pathParam = req.query.path;
-  const fullPath = Array.isArray(pathParam) ? pathParam : pathParam ? [pathParam] : [];
+  // Parse the URL path: /api/v1/businessId/catalog -> ['v1', 'businessId', 'catalog']
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const fullPath = url.pathname.replace(/^\/api\//, '').split('/').filter(Boolean);
   const method = req.method || 'GET';
 
   // Remove 'v1' prefix if present
@@ -182,9 +182,13 @@ async function handleCatalog(req: VercelRequest, res: VercelResponse, businessId
 
 // ============ AVAILABILITY ============
 async function handleAvailability(req: VercelRequest, res: VercelResponse, businessId: string) {
-  const { date, party_size, service_id, staff_id } = req.query;
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const date = url.searchParams.get('date');
+  const party_size = url.searchParams.get('party_size');
+  const service_id = url.searchParams.get('service_id');
+  const staff_id = url.searchParams.get('staff_id');
 
-  if (!date || typeof date !== 'string') {
+  if (!date) {
     return res.status(400).json({ error: 'Date is required' });
   }
 
@@ -229,12 +233,12 @@ async function handleAvailability(req: VercelRequest, res: VercelResponse, busin
   if (business.type === 'restaurant') {
     availableSlots = await getRestaurantAvailability(
       businessId, date, slots, bookings || [], blocks || [],
-      parseInt(party_size as string) || 2
+      parseInt(party_size || '2')
     );
   } else {
     availableSlots = await getSpaAvailability(
       businessId, date, slots, bookings || [], blocks || [],
-      service_id as string, staff_id as string
+      service_id || undefined, staff_id || undefined
     );
   }
 
@@ -379,7 +383,9 @@ async function getSpaAvailability(
 
 // ============ BOOKINGS ============
 async function handleGetBookings(req: VercelRequest, res: VercelResponse, businessId: string) {
-  const { phone, reference } = req.query;
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const phone = url.searchParams.get('phone');
+  const reference = url.searchParams.get('reference');
 
   let query = supabase
     .from('bookings')
@@ -588,7 +594,8 @@ async function handleManagerUpdateBusiness(req: VercelRequest, res: VercelRespon
 }
 
 async function handleManagerGetBookings(req: VercelRequest, res: VercelResponse, businessId: string) {
-  const { date } = req.query;
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const date = url.searchParams.get('date');
 
   let query = supabase
     .from('bookings')
@@ -711,7 +718,9 @@ async function handleCreateService(req: VercelRequest, res: VercelResponse, busi
 }
 
 async function handleGetBlocks(req: VercelRequest, res: VercelResponse, businessId: string) {
-  const { date } = req.query;
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const date = url.searchParams.get('date');
+  
   let query = supabase.from('slot_blocks').select('*').eq('business_id', businessId);
   if (date) query = query.eq('date', date);
 
@@ -742,7 +751,8 @@ async function handleCreateBlock(req: VercelRequest, res: VercelResponse, busine
 }
 
 async function handleDeleteBlock(req: VercelRequest, res: VercelResponse, businessId: string) {
-  const { blockId } = req.query;
+  const url = new URL(req.url || '', `https://${req.headers.host}`);
+  const blockId = url.searchParams.get('blockId');
 
   const { error } = await supabase
     .from('slot_blocks')
